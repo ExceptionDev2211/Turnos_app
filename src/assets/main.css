@@ -1,0 +1,6 @@
+body {
+    background: rgb(11, 109, 124);
+    background: linear-gradient(90deg, rgba(11, 109, 124, 1) 0%, rgba(0, 35, 58, 1) 95%);
+    font-family: 'JetBrains Mono';
+    overflow: hidden;
+}
