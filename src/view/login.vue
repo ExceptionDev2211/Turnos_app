@@ -16,7 +16,7 @@
                 <button  class="log_button" @click="submitForm">Iniciar sesión</button>
                 <p class="log_message"> O ingresa con </p>
                 <div class="form_buttons">
-                    <button type="submit" class="net_button">Google <img class="net_img"
+                    <button type="submit" class="net_button" >Google <img class="net_img"
                             src="../assets/images/google.png" alt=""></button>
                     <button type="submit" class="net_button">GitHub <img class="net_img"
                             src="../assets/images/github.png" alt=""></button>

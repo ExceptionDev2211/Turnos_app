@@ -1,20 +1,30 @@
 <template>
     <div class="cont">
+        <Popup :visible="showPopup" :onClose="closePopup">
+            <div class="select">
+                <p>Módulo A</p>
+                <p>Turno actual</p>
+                <p>Turnos disponibles</p>
+                <button>Seleccionar</button>
+
+            </div>
+        </Popup>
         <div class="main">
             <div class="header">
                 <p class="welcome">Bienvenido: </p>
                 <div class="noti">
-
+                    
                 </div>
                 <img class="logo_img" src="../assets/images/logo.png" alt="">
             </div>
             <div class="information">
                 <div class="interactive_div">
+                    <p>Selecciona el módulo en el cual quieres ser atendido</p>
                     <div class="table_info">
                         <table class="table_shifts">
                             <thead>
                                 <tr>
-                                    <th class="tableTitle">Estacíon</th>
+                                    <th class="tableTitle">Módulo</th>
                                     <th class="tableTitle">Dependiente</th>
                                     <th class="tableTitle">N° Turnos</th>
                                     <th class="tableTitle">N° Turnos asignados</th>
@@ -23,7 +33,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr @click="showPopup = true">
                                     <td>A</td>
                                     <td>Juan Reyes</td>
                                     <td>150</td>
@@ -82,8 +92,18 @@
 
 
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Popup from '../components/Popup.vue';
+const openPopup = () => {
+    showPopup.value = true;
+};
+
+const closePopup = () => {
+    showPopup.value = false;
+};
 const router = useRouter();
+const showPopup = ref(false);
 const goLogin = () => {
     router.push('/');
 }
@@ -162,10 +182,14 @@ const goLogin = () => {
     align-items: center;
     flex-direction: column;
 }
+.interactive_div p{
+    margin-right: auto;
+    margin-left: 30px;
+}
 
 .table_info {
 
-    height: 95%;
+    height: 80%;
     width: 97%;
     border-radius: 10px;
     overflow-y:auto;
@@ -226,6 +250,29 @@ const goLogin = () => {
 .table_shifts tbody tr:nth-child(n+1):hover {
     transform: scale(1.04);
     cursor: pointer;
+}
+.select{
+    display: flex;
+    flex-direction: column;
+}
+.select p{
+    color: white;
+    font-size: 20px;
+
+}
+.select button{
+    height: 40px;
+    background-color: #001c2e;
+    color: white;
+    font-size: 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.select button:hover{
+    transform: scale(1.05);
+
 }
 
 </style>

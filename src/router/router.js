@@ -21,18 +21,24 @@ const router = createRouter({
         name: 'Admin_main',
         path: '/admin_main',
         component: () => import('../view/admin_main.vue'),
-        meta: { requiresAuth: true }
+        // meta: { requiresAuth: true }
       },
       {
         name: 'User_main',
         path: '/user_main',
         component: () => import('../view/user_main.vue'),
-        meta: { requiresAuth: true }
+        // meta: { requiresAuth: true }
+      }, 
+      {
+        name: 'User_wating',
+        path: '/user_wating',
+        component: () => import('../view/user_wating.vue'),
+        // meta: { requiresAuth: true }
       }, 
     
   ]
 });
-router.beforeEach((to, from, next) => {
+/* router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   if (to.matched.some(record => record.meta.requiresAuth)) {
     
@@ -46,7 +52,7 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
-});
+}); */
 
 
 export default router
