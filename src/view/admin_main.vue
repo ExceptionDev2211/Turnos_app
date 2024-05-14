@@ -142,10 +142,10 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
-import Popup from '../components/Popup.vue';
-import Popup2 from '../components/Popup.vue';
-import Popup3 from '../components/Popup.vue';
-import Popup4 from '../components/Popup.vue';
+import Popup from '../components/popup.vue';
+import Popup2 from '../components/popup.vue';
+import Popup3 from '../components/popup.vue';
+import Popup4 from '../components/popup.vue';
 
 const showPopup = ref(false);
 const showPopup2 = ref(false);

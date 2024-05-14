@@ -94,7 +94,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import Popup from '../components/Popup.vue';
+import Popup from '../components/popup.vue';
 const openPopup = () => {
     showPopup.value = true;
 };

@@ -89,7 +89,7 @@ const submitForm = async () => {
 .main {
     display: flex;
     width: 40%;
-    height: 96vh;
+    height: auto;
     background-color: none;
     margin: auto;
     background-color: #0755B4;
@@ -123,15 +123,17 @@ const submitForm = async () => {
 }
 
 .in_register {
-    height: 30%;
+    height: 15px;
     border-radius: 10px;
     border: none;
     margin-bottom: 2%;
+    padding: 10px;
+    font-size: 20px;
 
 }
 
 .btn_reg {
-    height: 6%;
+    height: 40px;
     border: none;
     width: 90%;
     border-radius: 10px;
@@ -139,6 +141,7 @@ const submitForm = async () => {
     background-color: #00233A;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin-bottom: 20px;
 }
 
 .btn_reg:hover {

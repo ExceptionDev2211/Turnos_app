@@ -16,9 +16,9 @@
                 <button  class="log_button" @click="submitForm">Iniciar sesión</button>
                 <p class="log_message"> O ingresa con </p>
                 <div class="form_buttons">
-                    <button type="submit" class="net_button" >Google <img class="net_img"
+                    <button type="submit" class="net_button" @click="goGoogle">Google <img class="net_img"
                             src="../assets/images/google.png" alt=""></button>
-                    <button type="submit" class="net_button">GitHub <img class="net_img"
+                    <button type="submit" class="net_button" @click="goGit">GitHub <img class="net_img"
                             src="../assets/images/github.png" alt=""></button>
                     <button type="submit" class="net_button">Facebook <img class="net_img"
                             src="../assets/images/facebook.png" alt=""></button>
@@ -32,7 +32,7 @@
 
 
 <script setup>
-import axios from 'axios';
+
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -44,6 +44,14 @@ const goRegister = () => {
 
 const username = ref('')
 const password = ref('')
+const goGoogle = ()=>{
+    
+    window.open('https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?scope=openid%20profile%20email&state=S1bU2kgzUbSjYp2aOkK6WUmnAp47JDcyRj_HSmB8Zto.PlW7Pa93Mog.-Nj_n7lMQBaAXv3akTIAeQ&response_type=code&client_id=375215971745-nkg8l6u4qc374j8gh8vu6ji4sjtbdbmd.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A9090%2Frealms%2FTurnsManagementApp%2Fbroker%2Fgoogle%2Fendpoint&nonce=4WIvRNS8efNsWR2OfRqzHQ&service=lso&o2v=2&ddm=0&flowName=GeneralOAuthFlow','_blank');
+}
+const goGit = ()=>{
+    
+    window.open('https://github.com/login/oauth/authorize?scope=user%3Aemail&state=6Ag12yivuaEzr_KhlSjjQJnYIToNsm4KPPnFgnBVsm8.cZVmOLtM5g8.-Nj_n7lMQBaAXv3akTIAeQ&response_type=code&client_id=Ov23li1NLAu45heMNgl4&redirect_uri=http%3A%2F%2Flocalhost%3A9090%2Frealms%2FTurnsManagementApp%2Fbroker%2Fgithub%2Fendpoint','_blank');
+}
 const submitForm = async () => {
     try {
         const formData = new URLSearchParams();
