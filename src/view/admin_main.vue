@@ -22,9 +22,12 @@
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Usuario</label>
                     
-                    <select class="in_module" v-model="user_cancel"  ></select>          
-                        <option value=""></option>
-                    <button class="addmodulebtn">Cancelar</button>
+                    <select class="in_module" v-model="user_cancel"  >
+                        <option v-for="user in users" :value="user.id">
+                            {{ user.firstname }} {{ user.lastname }}
+                        </option>
+                    </select>          
+                    <button class="addmodulebtn" @click="cancelTurn" >Cancelar</button>
                 </form>
             </div>
         </Popup2>
@@ -33,10 +36,19 @@
                 <p>Apartar turno</p>
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Usuario</label>
-                    <input type="text" name="names" class="in_module" v-model="user_apart" required>
+                    <select class="in_module" v-model="user_apart"  >
+                        <option v-for="user in users" :value="user.id">
+                            {{ user.firstname }} {{ user.lastname }}
+                        </option>
+                    </select>          
+                    
                     <label class="lbl_module" >Módulo</label>
-                    <input type="text" name="names" class="in_module" v-model="user_module" required>                                        
-                    <button class="addmodulebtn">Apartar</button>
+                    <select class="in_module" v-model="user_module"  >
+                        <option v-for="station in stations" :key="station.name">
+                            {{ station.name }} 
+                        </option>
+                    </select>      
+                    <button class="addmodulebtn" @click="fetchApartTurn">Apartar</button>
                 </form>
             </div>
         </Popup3>
@@ -212,8 +224,76 @@ const fetchUsers = async () => {
     }
 };
 
+const user_apart = ref('');
+const user_module = ref('');
+const fetchApartTurn = async () => {
+    try {
+        const token = Cookies.get('token');
+        
+        const body = JSON.stringify({
+            userId: user_apart.value.id,
+            dependency: user_module.value.name
+        
+        });
 
+        const config = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: body 
+        };
 
+        const response = await fetch('http://localhost:8080/shift/create', config);
+        if (response.ok) {
+            const data = await response.json();
+            alert("Turno asignado correctamente");
+            closePopup3()
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al añadir el turno:', error);
+    }
+};
+
+const user_cancel = ref('')
+const cancelTurn = async () => {
+    try {
+        const token = Cookies.get('token');
+        
+
+        const config = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            
+        };
+
+        const response = await fetch(`http://localhost:8080/dependency/${user_cancel.value.id}`, config);
+        if (response.ok) {
+            const data = await response.json();
+            alert("Turno cancelado correctamente");
+            closePopup2()
+            fetchStations();
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al añadir modulo', error);
+    }
+};
 
 const module_name = ref('')
 const dependency = ref('')
@@ -259,7 +339,7 @@ const addTurns = async () => {
     try {
         const token = Cookies.get('token');
 
-        const url = `http://localhost:8080/dependency/updateShift?dependencyName=${encodeURIComponent(selectedStation.value.name)}&newShift=${encodeURIComponent(add_turns_number.value)}`;
+        const url = `http://localhost:8080/dependency/updateShifts?dependencyName=${selectedStation.value.name}&newShifts=${add_turns_number.value}`;
 
         const config = {
             method: 'PUT',
@@ -286,11 +366,12 @@ const addTurns = async () => {
     }
 };
 
+
 const nextTurn = async () => {
     try {
         const token = Cookies.get('token');
 
-        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${encodeURIComponent(selectedStation.value.name)}&newCurrentShifts=${encodeURIComponent(selectedStation.value.currentShift + 1)}`;
+        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${selectedStation.value.name}&newCurrentShifts=${selectedStation.value.currentShift + 1}`;
 
         const config = {
             method: 'PUT',
@@ -328,6 +409,7 @@ const goLogin = () => {
 onMounted(() => {
     fetchStations();
     fetchUsers();
+    
 
 });
 
