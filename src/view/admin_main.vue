@@ -231,7 +231,7 @@ const fetchApartTurn = async () => {
         
         const body = JSON.stringify({
             userId: user_apart.value.id,
-            dependency: user_module.value.name
+            dependency: user_module.value.dependencyName
         
         });
 
