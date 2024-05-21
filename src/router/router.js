@@ -34,7 +34,7 @@ const router = createRouter({
         name: 'User_wating',
         path: '/user_waiting',
         component: () => import('../view/user_wating.vue'),
-        meta: { requiresAuth: true }
+     //   meta: { requiresAuth: true }
       }, 
     
   ]

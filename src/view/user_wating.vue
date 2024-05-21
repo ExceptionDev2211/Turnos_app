@@ -2,18 +2,27 @@
     <div class="cont">
         <Popup :visible="showPopup" :onClose="closePopup">
             <div class="select">
-                <p>Módulo A</p>
-                <p>Turno actual</p>
-                <p>Turnos disponibles</p>
-                <button>Solicitar turno</button>
+                <p>Tienes un turno pendiente en el modulo: {{user_info.dependency}}</p>
+                <p>Turno actual: {{dependency.currentShift}}</p>
+                <p>Tu turno: {{user_info.shift}}</p>
+                <p>Te atenderá: {{dependency.personInCharge}}</p>
 
             </div>
         </Popup>
+        <Popup2 :visible="showPopup2" :onClose="closePopup2">
+            <div class="select">
+                <p>¡Ya es tu turno! , por favor acercate al modulo: {{user_info.dependency}} </p>
+                <button @click="fetchDeleteShift" class="btn_noti_turn">Aceptar</button>
+
+            </div>
+        </Popup2>
         <div class="main">
             <div class="header">
                 <p class="welcome">Bienvenido: </p>
                 <div class="noti">
-                    
+                    <button class="btn_noti" v-show="showNotificationButton" @click="openPopup">
+                    <img class="logo_img" src="../assets/images/noti.png" alt="">
+                </button>
                 </div>
                 <img class="logo_img" src="../assets/images/logo.png" alt="">
             </div>
@@ -22,11 +31,11 @@
                     <div class="waitingImg">
                         <img src="../assets/images/espera.png" alt="">
                     </div>
-                    <div  class="waitingInfo">
+                    <div class="waitingInfo">
                         <div class="waitingContain">
-                            <p>Módulo: {{user_info.dependency}}</p>
-                            <p>Turno actual: {{ dependency.currentShift }}  </p>
-                            <p>Tu turno: {{user_info.shift}} </p>
+                            <p>Módulo: {{ user_info.dependency }}</p>
+                            <p>Turno actual: {{ dependency.currentShift }} </p>
+                            <p>Tu turno: {{ user_info.shift }} </p>
                             <p>Seras atendido por:{{ dependency.personInCharge }} </p>
                             <button @click="fetchDeleteShift(userId)">Cancelar turno</button>
                         </div>
@@ -41,9 +50,10 @@
 
 
 <script setup>
-import { ref, onMounted,onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import Popup from '../components/popup.vue';
+import Popup2 from '../components/popup.vue';
 import Cookies from 'js-cookie';
 
 const userId = ref(Cookies.get('id'))
@@ -57,9 +67,13 @@ const closePopup = () => {
 };
 const router = useRouter();
 const showPopup = ref(false);
-const goLogin = () => {
-    router.push('/');
-}
+const showPopup2 = ref(true);
+const openPopup2 = () => {
+    showPopup2.value = true;
+};
+const closePopup2 = () => {
+    showPopup2.value = false;
+};
 const fetchDeleteShift = async (userId) => {
     try {
         const token = Cookies.get('token');
@@ -75,7 +89,7 @@ const fetchDeleteShift = async (userId) => {
         const response = await fetch(`http://localhost:8080/shift/${userId}`, config);
         if (response.ok) {
             const data = await response.json();
-            alert('Turno cancelado correctamente' )
+            alert('Turno cancelado correctamente')
             router.push('/user_main');
         } else {
             console.error('Error en la respuesta:', response.statusText);
@@ -105,10 +119,10 @@ const fetchUser = async () => {
         };
 
         const response = await fetch(`http://localhost:8080/shift/${Cookies.get('id')}`, config);
-        
+
         if (response.ok) {
             const data = await response.json();
-            user_info.value = data;  
+            user_info.value = data;
         } else {
             console.error('Error en la respuesta:', response.statusText);
             if (response.status === 401) {
@@ -121,6 +135,7 @@ const fetchUser = async () => {
 
     }
 };
+const showNotificationButton = ref(false);
 const dependency = ref('')
 const fetchDependency = async () => {
     try {
@@ -135,10 +150,22 @@ const fetchDependency = async () => {
         };
 
         const response = await fetch(`http://localhost:8080/dependency/${user_info.value.dependency}`, config);
-        
+
         if (response.ok) {
             const data = await response.json();
-            dependency.value = data;  
+            dependency.value = data;
+
+            const isClose = (actual_turn, user_turn, range = 10) => {
+                return Math.abs(actual_turn - user_turn) <= range;
+            }
+            if (isClose(dependency.value.currentShift, user_info.value.shift)) {
+                showNotificationButton.value = true;
+            }else{
+                showNotificationButton.value = false;
+            }
+            if(dependency.value.currentShift == user_info.value.shift ){
+                openPopup2();
+            }
         } else {
             console.error('Error en la respuesta:', response.statusText);
             if (response.status === 401) {
@@ -160,8 +187,8 @@ onBeforeUnmount(() => {
 });
 onMounted(() => {
     fetchUser();
-   fetchDependency();
-   startFetching();
+    fetchDependency();
+    startFetching();
 
 });
 
@@ -217,9 +244,9 @@ onMounted(() => {
 }
 
 .noti {
-
+    display: flex;
     width: 10%;
-    height: 80%;
+    height: 50%;
     margin-left: auto;
 }
 
@@ -238,28 +265,31 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
 }
 
-.waitingImg{
+.waitingImg {
     display: flex;
     height: 90%;
     width: 50%;
     justify-content: center;
     align-items: center;
-    
+
 }
-.waitingImg img{
+
+.waitingImg img {
     height: 105%;
-    
-    
+
+
 }
-.waitingInfo{
-    
+
+.waitingInfo {
+
     height: 90%;
     width: 50%;
 }
-.waitingContain{
+
+.waitingContain {
     background-color: #DCE0E6;
     height: 90%;
     width: 85%;
@@ -268,14 +298,16 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    padding:20px ;
+    padding: 20px;
     gap: 5%;
 }
-.waitingContain p{
+
+.waitingContain p {
     font-size: 20px;
-    
+
 }
-.waitingContain button{
+
+.waitingContain button {
     height: 40px;
     width: 200px;
     border-radius: 10px;
@@ -288,8 +320,33 @@ onMounted(() => {
     transition: all 0.3s ease;
 
 }
-.waitingContain button:hover{
+
+.waitingContain button:hover {
     transform: scale(1.05);
 
+}
+.btn_noti{
+    background: none;
+    cursor: pointer;
+    border: none;
+    transform: all 0.3s ease;
+    
+}
+.btn_noti:hover{
+    transform: scale(1.1);
+}
+.btn_noti_turn{
+    height: 40px;
+    background-color: #001c2e;
+    color: white;
+    font-size: 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.btn_noti_turn:hover{
+    transform: scale(1.05);
 }
 </style>
