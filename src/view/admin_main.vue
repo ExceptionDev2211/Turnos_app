@@ -5,12 +5,12 @@
                 <p>Agregar módulo</p>
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Nombre del módulo</label>
-                    <input type="text" name="names" class="in_module" v-model="names" required>
+                    <input type="text" name="names" class="in_module" v-model="module_name" required>
                     <label class="lbl_module">Dependiente</label>
-                    <input type="text" name="lastnames" class="in_module" v-model="lastNames" required>
+                    <input type="text" name="lastnames" class="in_module" v-model="dependency" required>
                     <label class="lbl_module">Numero de turnos</label>
-                    <input type="number" name="email" class="in_module" v-model="mail" required>
-                    <button class="addmodulebtn">Agregar</button>
+                    <input type="number" name="email" class="in_module" v-model="turns_number" required>
+                    <button class="addmodulebtn" @click="addModule">Agregar</button>
                 </form>
             </div>
 
@@ -21,7 +21,7 @@
                 <p>Cancelar turno</p>
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Usuario</label>
-                    <input type="text" name="names" class="in_module" v-model="names" required>                    
+                    <input type="text" name="names" class="in_module" v-model="user_cancel" required>                    
                     <button class="addmodulebtn">Cancelar</button>
                 </form>
             </div>
@@ -31,23 +31,23 @@
                 <p>Apartar turno</p>
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Usuario</label>
-                    <input type="text" name="names" class="in_module" v-model="names" required>
+                    <input type="text" name="names" class="in_module" v-model="user_apart" required>
                     <label class="lbl_module" >Módulo</label>
-                    <input type="text" name="names" class="in_module" v-model="names" required>                                        
+                    <input type="text" name="names" class="in_module" v-model="user_module" required>                                        
                     <button class="addmodulebtn">Apartar</button>
                 </form>
             </div>
         </Popup3>
         <Popup4 :visible="showPopup4" :onClose="closePopup4">
             <div class="stationP">
-                <p>Módulo A</p>
+                <p>Módulo A {{selectedStation.dependencyName}}</p>
                 <div class="moduleconfigure">
-                    <p>Dependiente: </p>
-                    <p>N° disponibles: </p>
-                    <p>N° asignados: </p>
-                    <p>Turno actual</p>
-                    <p>Añadir turnos: <input type="number"> <button>añadir</button></p>
-                    <button class="nextbtn">Siguiente turno</button>
+                    <p>Dependiente: {{selectedStation.personInCharge}}</p>
+                    <p>N° disponibles: {{selectedStation.shifts}} </p>
+                    <p>N° asignados: {{selectedStation.assignedShifts}}</p>
+                    <p>Turno actual: {{selectedStation.currentShift}}</p>
+                    <p>Añadir turnos: <input type="number" v-model="add_turns_number"> <button @click="addTurns()">añadir</button></p>
+                    <button class="nextbtn" @click="nextTurn()">Siguiente turno</button>
                 </div>
             </div>
         </Popup4>
@@ -55,7 +55,7 @@
         
         <div class="main">
             <div class="header">
-                <p class="welcome">Bienvenido: </p>
+                <p class="welcome">Bienvenido: {{ user_name }} </p>
                 <div class="noti">
 
                 </div>
@@ -76,15 +76,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click="showPopup4 = true">
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
+                                <tr v-for="station in stations" :key="station.id" @click="openPopup4(station)">
+                                    <td>{{ station.dependencyName }}</td>
+                                    <td>{{ station.personInCharge }}</td>
+                                    <td>{{ station.shifts }}</td>
+                                    <td>{{ station.assignedShifts }}</td>
+                                    <td>{{ station.currentShift }}</td>
+                                    <td>{{ station.availableShifts }}</td>
                                 </tr>
-                              
 
 
                             </tbody>
@@ -108,7 +107,7 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 import Popup from '../components/popup.vue';
@@ -116,12 +115,12 @@ import Popup2 from '../components/popup.vue';
 import Popup3 from '../components/popup.vue';
 import Popup4 from '../components/popup.vue';
 import Cookies from 'js-cookie';
-
+const selectedStation = ref('')
 const showPopup = ref(false);
 const showPopup2 = ref(false);
 const showPopup3 = ref(false);
 const showPopup4 = ref(false);
-
+const user_name = ref(Cookies.get('name'));
 const openPopup = () => {
     showPopup.value = true;
 };
@@ -144,13 +143,149 @@ const openPopup3 = () => {
 const closePopup3 = () => {
     showPopup3.value = false;
 };
-const openPopup4 = () => {
+const openPopup4 = (v) => {
     showPopup4.value = true;
+    selectedStation.value = v;
 };
 
 const closePopup4 = () => {
     showPopup4.value = false;
 };
+
+const fetchStations = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const config = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch('http://localhost:8080/dependency', config);
+        if (response.ok) {
+            const data = await response.json();
+            stations.value = data;
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al obtener estaciones:', error);
+
+    }
+};
+
+
+
+
+const module_name = ref('')
+const dependency = ref('')
+const turns_number = ref('')
+const addModule = async () => {
+    try {
+        const token = Cookies.get('token');
+        
+        const body = JSON.stringify({
+            dependencyName: module_name.value,
+            personInCharge: dependency.value,
+            shifts: turns_number.value
+        });
+
+        const config = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: body 
+        };
+
+        const response = await fetch('http://localhost:8080/dependency/create', config);
+        if (response.ok) {
+            const data = await response.json();
+            alert("Modulo agregado correctamente");
+            router.push('/user_waiting');
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al añadir modulo', error);
+    }
+};
+
+const add_turns_number = ref('')
+const addTurns = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const url = `http://localhost:8080/dependency/updateShift?dependencyName=${encodeURIComponent(selectedStation.value.name)}&newShift=${encodeURIComponent(add_turns_number.value)}`;
+
+        const config = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch(url, config);
+        if (response.ok) {
+            const data = await response.json();
+            alert("Módulo editado correctamente");
+            closePopup4(); 
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al editar módulo:', error);
+    }
+};
+
+const nextTurn = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${encodeURIComponent(selectedStation.value.name)}&newCurrentShifts=${encodeURIComponent(selectedStation.value.currentShift + 1)}`;
+
+        const config = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch(url, config);
+        if (response.ok) {
+            const data = await response.json();
+            alert("Módulo editado correctamente");
+            closePopup4(); 
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al editar módulo:', error);
+    }
+};
+
 
 
 
@@ -159,6 +294,10 @@ const goLogin = () => {
 }
 
 
+onMounted(() => {
+    fetchStations();
+
+});
 
 
 </script>

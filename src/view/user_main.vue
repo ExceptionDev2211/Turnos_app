@@ -105,7 +105,7 @@ const fetchAddTurn = async () => {
         
         const body = JSON.stringify({
             userId: Cookies.get('id'),
-            dependency: selectedStation.dependencyName
+            dependency: selectedStation.value.dependencyName
         
         });
 

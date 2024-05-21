@@ -89,8 +89,7 @@ const fetchDeleteShift = async (userId) => {
     }
 };
 
-// Llamada a la función para eliminar un turno específico
-fetchDeleteShift('userID123');
+
 
 
 </script>

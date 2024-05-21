@@ -46,7 +46,6 @@ const submitForm = async () => {
         try {
             const response = await fetch('http://localhost:8080/auth/create', {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
