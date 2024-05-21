@@ -230,8 +230,8 @@ const fetchApartTurn = async () => {
         const token = Cookies.get('token');
         
         const body = JSON.stringify({
-            userId: user_apart.value.id,
-            dependency: user_module.value.dependencyName
+            userId: user_apart.value,
+            dependency: user_module.value
         
         });
 
@@ -276,7 +276,7 @@ const cancelTurn = async () => {
             
         };
 
-        const response = await fetch(`http://localhost:8080/dependency/${user_cancel.value.id}`, config);
+        const response = await fetch(`http://localhost:8080/shift/${user_cancel.value}`, config);
         if (response.ok) {
             const data = await response.json();
             alert("Turno cancelado correctamente");
@@ -338,7 +338,7 @@ const addTurns = async () => {
     try {
         const token = Cookies.get('token');
 
-        const url = `http://localhost:8080/dependency/updateShifts?dependencyName=${selectedStation.value.name}&newShifts=${parseInt(add_turns_number.value)}`;
+        const url = `http://localhost:8080/dependency/updateShifts?dependencyName=${selectedStation.value.dependencyName}&newShifts=${parseInt(add_turns_number.value)}`;
 
         const config = {
             method: 'PUT',
@@ -353,6 +353,7 @@ const addTurns = async () => {
             const data = await response.json();
             alert("Módulo editado correctamente");
             closePopup4(); 
+            fetchStations();
         } else {
             console.error('Error en la respuesta:', response.statusText);
             if (response.status === 401) {
@@ -370,7 +371,7 @@ const nextTurn = async () => {
     try {
         const token = Cookies.get('token');
 
-        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${selectedStation.value.name}&newCurrentShifts=${parseInt(selectedStation.value.currentShift + 1)}`;
+        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${selectedStation.value.dependencyName}&newCurrentShift=${parseInt(selectedStation.value.currentShift + 1)}`;
 
         const config = {
             method: 'PUT',
@@ -385,6 +386,7 @@ const nextTurn = async () => {
             const data = await response.json();
             alert("Módulo editado correctamente");
             closePopup4(); 
+            fetchStations();
         } else {
             console.error('Error en la respuesta:', response.statusText);
             if (response.status === 401) {

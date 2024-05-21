@@ -79,6 +79,7 @@ const fetchDeleteShift = async (userId) => {
             router.push('/user_main');
         } else {
             console.error('Error en la respuesta:', response.statusText);
+            router.push('/user_main');
             if (response.status === 401) {
                 alert("No está autorizado. Por favor, inicie sesión.");
                 router.push('/');
