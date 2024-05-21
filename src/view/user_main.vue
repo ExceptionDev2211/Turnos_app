@@ -71,6 +71,38 @@ const openPopup = () => {
     showPopup.value = true;
 };
 const stations = ref([])
+
+
+
+const fetchUser = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const config = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch(`http://localhost:8080/shift/${Cookies.get('id')}`, config);
+        if (response.ok) {
+            const data = await response.json();
+            stations.value = data;
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al obtener estaciones:', error);
+
+    }
+};
+
 const fetchStations = async () => {
     try {
         const token = Cookies.get('token');

@@ -38,7 +38,7 @@
                     <label class="lbl_module" >Usuario</label>
                     <select class="in_module" v-model="user_apart"  >
                         <option v-for="user in users" :value="user.id">
-                            {{ user.firstname }} {{ user.lastname }}
+                            {{ user.firstName }} {{ user.lastName }}
                         </option>
                     </select>          
                     
@@ -207,7 +207,7 @@ const fetchUsers = async () => {
             }
         };
 
-        const response = await fetch('http://localhost:8080/search', config);
+        const response = await fetch('http://localhost:8080/auth/search', config);
         if (response.ok) {
             const data = await response.json();
             users.value = data;
@@ -339,7 +339,7 @@ const addTurns = async () => {
     try {
         const token = Cookies.get('token');
 
-        const url = `http://localhost:8080/dependency/updateShifts?dependencyName=${selectedStation.value.name}&newShifts=${add_turns_number.value}`;
+        const url = `http://localhost:8080/dependency/updateShifts?dependencyName=${selectedStation.value.name}&newShifts=${parseInt(add_turns_number.value)}`;
 
         const config = {
             method: 'PUT',
@@ -371,7 +371,7 @@ const nextTurn = async () => {
     try {
         const token = Cookies.get('token');
 
-        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${selectedStation.value.name}&newCurrentShifts=${selectedStation.value.currentShift + 1}`;
+        const url = `http://localhost:8080/dependency/updateCurrentShift?dependencyName=${selectedStation.value.name}&newCurrentShifts=${parseInt(selectedStation.value.currentShift + 1)}`;
 
         const config = {
             method: 'PUT',
@@ -590,6 +590,7 @@ onMounted(() => {
 
 }
 .in_module{
+    color: black;
     border-radius: 10px;
     height: 25px;
     margin-bottom: 10px;
