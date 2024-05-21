@@ -25,7 +25,7 @@
                     <div  class="waitingInfo">
                         <div class="waitingContain">
                             <p>Módulo: {{user_info.dependency}}</p>
-                            <p>Turno actual: {{ dependency.dependencyName }}  </p>
+                            <p>Turno actual: {{ dependency.currentShift }}  </p>
                             <p>Tu turno: {{user_info.shift}} </p>
                             <p>Seras atendido por:{{ dependency.personInCharge }} </p>
                             <button @click="fetchDeleteShift(userId)">Cancelar turno</button>
@@ -87,6 +87,7 @@ const fetchDeleteShift = async (userId) => {
         }
     } catch (error) {
         console.error('Error al eliminar el turno:', error);
+        router.push('/user_main');
     }
 };
 
@@ -151,7 +152,7 @@ const fetchDependency = async () => {
     }
 };
 const startFetching = () => {
-    intervalId.value = setInterval(fetchDependency, 10000);
+    intervalId.value = setInterval(fetchDependency, 3000);
 };
 const intervalId = ref(null);
 onBeforeUnmount(() => {
