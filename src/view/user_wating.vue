@@ -24,10 +24,10 @@
                     </div>
                     <div  class="waitingInfo">
                         <div class="waitingContain">
-                            <p>Módulo:</p>
-                            <p>Turno actual: </p>
-                            <p>Tu turno: </p>
-                            <p>Seras atendido por: </p>
+                            <p>Módulo: {{user_info.dependency}}</p>
+                            <p>Turno actual: {{ dependency.dependencyName }}  </p>
+                            <p>Tu turno: {{user_info.shift}} </p>
+                            <p>Seras atendido por:{{ dependency.personInCharge }} </p>
                             <button @click="fetchDeleteShift(userId)">Cancelar turno</button>
                         </div>
                     </div>
@@ -41,7 +41,7 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Popup from '../components/popup.vue';
 import Cookies from 'js-cookie';
@@ -89,7 +89,79 @@ const fetchDeleteShift = async (userId) => {
     }
 };
 
+const user_info = ref('')
+const fetchUser = async () => {
+    try {
+        const token = Cookies.get('token');
 
+        const config = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch(`http://localhost:8080/shift/${Cookies.get('id')}`, config);
+        
+        if (response.ok) {
+            const data = await response.json();
+            user_info.value = data;  
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al obtener estaciones:', error);
+
+    }
+};
+const dependency = ref('')
+const fetchDependency = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const config = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch(`http://localhost:8080/dependency/${user_info.value.dependency}`, config);
+        
+        if (response.ok) {
+            const data = await response.json();
+            dependency.value = data;  
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al obtener estaciones:', error);
+
+    }
+};
+const startFetching = () => {
+    intervalId.value = setInterval(fetchDependency, 10000);
+};
+const intervalId = ref(null);
+onBeforeUnmount(() => {
+    clearInterval(intervalId.value);
+});
+onMounted(() => {
+    fetchUser();
+   fetchDependency();
+   startFetching();
+
+});
 
 
 </script>

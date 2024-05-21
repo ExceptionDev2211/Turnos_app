@@ -43,7 +43,7 @@
                     
                     <label class="lbl_module" >Módulo</label>
                     <select class="in_module" v-model="user_module"  >
-                        <option v-for="station in stations" :key="station.dependencyName">
+                        <option v-for="station in stations" :value="station.dependencyName">
                             {{ station.dependencyName }} 
                         </option>
                     </select>      
