@@ -41,7 +41,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import Popup from '../components/popup.vue';
 import Cookies from 'js-cookie';
