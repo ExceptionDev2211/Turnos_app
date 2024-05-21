@@ -67,7 +67,7 @@ const closePopup = () => {
 };
 const router = useRouter();
 const showPopup = ref(false);
-const showPopup2 = ref(true);
+const showPopup2 = ref(false);
 const openPopup2 = () => {
     showPopup2.value = true;
 };
@@ -348,5 +348,8 @@ onMounted(() => {
 }
 .btn_noti_turn:hover{
     transform: scale(1.05);
+}
+.select p{
+    color: white;
 }
 </style>
