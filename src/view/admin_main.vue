@@ -21,7 +21,9 @@
                 <p>Cancelar turno</p>
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Usuario</label>
-                    <input type="text" name="names" class="in_module" v-model="user_cancel" required>                    
+                    
+                    <select class="in_module" v-model="user_cancel"  ></select>          
+                        <option value=""></option>
                     <button class="addmodulebtn">Cancelar</button>
                 </form>
             </div>
@@ -151,7 +153,7 @@ const openPopup4 = (v) => {
 const closePopup4 = () => {
     showPopup4.value = false;
 };
-
+const stations = ref([])
 const fetchStations = async () => {
     try {
         const token = Cookies.get('token');
@@ -177,6 +179,35 @@ const fetchStations = async () => {
         }
     } catch (error) {
         console.error('Error al obtener estaciones:', error);
+
+    }
+};
+const users = ref([])
+const fetchUsers = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const config = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch('http://localhost:8080/search', config);
+        if (response.ok) {
+            const data = await response.json();
+            users.value = data;
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                
+            }
+        }
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error);
 
     }
 };
@@ -210,7 +241,7 @@ const addModule = async () => {
         if (response.ok) {
             const data = await response.json();
             alert("Modulo agregado correctamente");
-            router.push('/user_waiting');
+            fetchStations();
         } else {
             console.error('Error en la respuesta:', response.statusText);
             if (response.status === 401) {
@@ -296,6 +327,7 @@ const goLogin = () => {
 
 onMounted(() => {
     fetchStations();
+    fetchUsers();
 
 });
 
