@@ -87,9 +87,10 @@ const fetchUser = async () => {
         };
 
         const response = await fetch(`http://localhost:8080/shift/${Cookies.get('id')}`, config);
+        router.push('/user_waiting');
         if (response.ok) {
             const data = await response.json();
-            stations.value = data;
+            
         } else {
             console.error('Error en la respuesta:', response.statusText);
             if (response.status === 401) {
@@ -186,6 +187,7 @@ const goLogin = () => {
 }
 
 onMounted(() => {
+    fetchUser();
     fetchStations();
 
 });

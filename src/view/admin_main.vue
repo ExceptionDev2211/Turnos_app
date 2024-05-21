@@ -21,10 +21,9 @@
                 <p>Cancelar turno</p>
                 <form action="" class="popformstation">
                     <label class="lbl_module" >Usuario</label>
-                    
                     <select class="in_module" v-model="user_cancel"  >
                         <option v-for="user in users" :value="user.id">
-                            {{ user.firstname }} {{ user.lastname }}
+                            {{ user.firstName }} {{ user.lastName }}
                         </option>
                     </select>          
                     <button class="addmodulebtn" @click="cancelTurn" >Cancelar</button>
@@ -44,8 +43,8 @@
                     
                     <label class="lbl_module" >Módulo</label>
                     <select class="in_module" v-model="user_module"  >
-                        <option v-for="station in stations" :key="station.name">
-                            {{ station.name }} 
+                        <option v-for="station in stations" :key="station.dependencyName">
+                            {{ station.dependencyName }} 
                         </option>
                     </select>      
                     <button class="addmodulebtn" @click="fetchApartTurn">Apartar</button>
