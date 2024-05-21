@@ -2,18 +2,18 @@
     <div class="cont">
         <Popup :visible="showPopup" :onClose="closePopup">
             <div class="select">
-                <p>Módulo A</p>
-                <p>Turno actual</p>
-                <p>Turnos disponibles</p>
-                <button>Seleccionar</button>
+                <p>{{ selectedStation.dependencyName }}</p>
+                <p>Turno actual: {{ selectedStation.currentShift }}</p>
+                <p>Turnos disponibles: {{ selectedStation.availableShifts }}</p>
+                <button @click="fetchAddTurn">Seleccionar</button>
 
             </div>
         </Popup>
         <div class="main">
             <div class="header">
-                <p class="welcome">Bienvenido: </p>
+                <p class="welcome">Bienvenido: {{ user_name }} </p>
                 <div class="noti">
-                    
+
                 </div>
                 <img class="logo_img" src="../assets/images/logo.png" alt="">
             </div>
@@ -33,54 +33,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click="showPopup = true">
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
+                                <tr v-for="station in stations" :key="station.id" @click="show(station)">
+                                    <td>{{ station.dependencyName }}</td>
+                                    <td>{{ station.personInCharge }}</td>
+                                    <td>{{ station.shifts }}</td>
+                                    <td>{{ station.assignedShifts }}</td>
+                                    <td>{{ station.currentShift }}</td>
+                                    <td>{{ station.availableShifts }}</td>
                                 </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                
-                              
+
+
                             </tbody>
 
                         </table>
 
                     </div>
-                   
+
 
                 </div>
             </div>
@@ -92,21 +60,103 @@
 
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, } from 'vue-router';
 import Popup from '../components/popup.vue';
+import Cookies from 'js-cookie';
+
+const user_name = ref(Cookies.get('name'));
+const selectedStation = ref('')
 const openPopup = () => {
     showPopup.value = true;
 };
+const stations = ref([])
+const fetchStations = async () => {
+    try {
+        const token = Cookies.get('token');
+
+        const config = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch('http://localhost:8080/dependency', config);
+        if (response.ok) {
+            const data = await response.json();
+            stations.value = data;
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al obtener estaciones:', error);
+
+    }
+};
+const fetchAddTurn = async () => {
+    try {
+        const token = Cookies.get('token');
+        
+        const body = JSON.stringify({
+            userId: Cookies.get('id'),
+            dependency: selectedStation.dependencyName
+        
+        });
+
+        const config = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: body 
+        };
+
+        const response = await fetch('http://localhost:8080/shift/create', config);
+        if (response.ok) {
+            const data = await response.json();
+            alert("Turno asignado correctamente");
+            router.push('/user_waiting');
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al añadir el turno:', error);
+    }
+};
+
+
+
+
 
 const closePopup = () => {
     showPopup.value = false;
 };
 const router = useRouter();
 const showPopup = ref(false);
+const show = (v) => {
+    showPopup.value = true;
+    selectedStation.value = v;
+};
+
 const goLogin = () => {
     router.push('/');
 }
+
+onMounted(() => {
+    fetchStations();
+
+});
 
 </script>
 
@@ -182,7 +232,8 @@ const goLogin = () => {
     align-items: center;
     flex-direction: column;
 }
-.interactive_div p{
+
+.interactive_div p {
     margin-right: auto;
     margin-left: 30px;
 }
@@ -192,11 +243,11 @@ const goLogin = () => {
     height: 80%;
     width: 97%;
     border-radius: 10px;
-    overflow-y:auto;
+    overflow-y: auto;
     overflow-x: hidden;
-    scrollbar-width: thin; 
+    scrollbar-width: thin;
     scrollbar-color: #999999 #f2f2f2;
-    
+
 }
 
 .buttons {
@@ -205,8 +256,8 @@ const goLogin = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
-    
+
+
 }
 
 .table_shifts {
@@ -217,7 +268,7 @@ const goLogin = () => {
     border-collapse: collapse;
     border-radius: 10px;
     background-color: white;
-    
+
 
 }
 
@@ -228,8 +279,8 @@ const goLogin = () => {
     color: white;
     background-color: #001c2e;
     height: 60px;
-    top: 0; 
-    z-index: 1; 
+    top: 0;
+    z-index: 1;
 }
 
 .table_shifts th:first-child {
@@ -239,11 +290,13 @@ const goLogin = () => {
 .table_shifts th:last-child {
     border-top-right-radius: 10px;
 }
-.table_shifts td{
-    
+
+.table_shifts td {
+
     padding: 30px 30px;
 }
-.table_shifts tr{
+
+.table_shifts tr {
     transition: all 0.3s ease;
 }
 
@@ -251,16 +304,19 @@ const goLogin = () => {
     transform: scale(1.04);
     cursor: pointer;
 }
-.select{
+
+.select {
     display: flex;
     flex-direction: column;
 }
-.select p{
+
+.select p {
     color: white;
     font-size: 20px;
 
 }
-.select button{
+
+.select button {
     height: 40px;
     background-color: #001c2e;
     color: white;
@@ -270,9 +326,9 @@ const goLogin = () => {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-.select button:hover{
+
+.select button:hover {
     transform: scale(1.05);
 
 }
-
 </style>

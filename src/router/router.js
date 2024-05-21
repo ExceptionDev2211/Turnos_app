@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../view/login.vue'
+import Cookies from 'js-cookie'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -38,8 +39,9 @@ const router = createRouter({
     
   ]
 });
-/* router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
+
+ router.beforeEach((to, from, next) => {
+  const token = Cookies.get('token');
   if (to.matched.some(record => record.meta.requiresAuth)) {
     
     if (!token) {
@@ -52,7 +54,7 @@ const router = createRouter({
   } else {
     next();
   }
-}); */
+}); 
 
 
 export default router

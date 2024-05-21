@@ -44,8 +44,9 @@ const password2 = ref('');
 const submitForm = async () => {
     if (true) {
         try {
-            const response = await fetch('http://127.0.0.1:8080/keycloak/user/create', {
+            const response = await fetch('http://localhost:8080/auth/create', {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -57,7 +58,8 @@ const submitForm = async () => {
                     address: addres.value,
                     organization: organization.value,
                     password: password1.value
-                })
+                }),
+                
             });
             const data = await response.json();
             if (response.status === 201) {

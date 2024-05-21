@@ -13,7 +13,7 @@
                     <input type="password" id="password" name="password" class="in_log" v-model="password">
                     <a class="forget_pass" href="">¿Haz olvidado tu contraseña?</a>
                 </form>
-                <button  class="log_button" @click="submitForm">Iniciar sesión</button>
+                <button class="log_button" @click="submitForm">Iniciar sesión</button>
                 <p class="log_message"> O ingresa con </p>
                 <div class="form_buttons">
                     <button type="submit" class="net_button" @click="goGoogle">Google <img class="net_img"
@@ -39,18 +39,18 @@ const router = useRouter();
 const goRegister = () => {
     router.push('/login/register');
 }
-
+import Cookies from 'js-cookie';
 
 
 const username = ref('')
 const password = ref('')
-const goGoogle = ()=>{
-    
-    window.open('https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?scope=openid%20profile%20email&state=S1bU2kgzUbSjYp2aOkK6WUmnAp47JDcyRj_HSmB8Zto.PlW7Pa93Mog.-Nj_n7lMQBaAXv3akTIAeQ&response_type=code&client_id=375215971745-nkg8l6u4qc374j8gh8vu6ji4sjtbdbmd.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A9090%2Frealms%2FTurnsManagementApp%2Fbroker%2Fgoogle%2Fendpoint&nonce=4WIvRNS8efNsWR2OfRqzHQ&service=lso&o2v=2&ddm=0&flowName=GeneralOAuthFlow','_blank');
+const goGoogle = () => {
+
+    window.open('https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?scope=openid%20profile%20email&state=S1bU2kgzUbSjYp2aOkK6WUmnAp47JDcyRj_HSmB8Zto.PlW7Pa93Mog.-Nj_n7lMQBaAXv3akTIAeQ&response_type=code&client_id=375215971745-nkg8l6u4qc374j8gh8vu6ji4sjtbdbmd.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A9090%2Frealms%2FTurnsManagementApp%2Fbroker%2Fgoogle%2Fendpoint&nonce=4WIvRNS8efNsWR2OfRqzHQ&service=lso&o2v=2&ddm=0&flowName=GeneralOAuthFlow', '_blank');
 }
-const goGit = ()=>{
-    
-    window.open('https://github.com/login/oauth/authorize?scope=user%3Aemail&state=6Ag12yivuaEzr_KhlSjjQJnYIToNsm4KPPnFgnBVsm8.cZVmOLtM5g8.-Nj_n7lMQBaAXv3akTIAeQ&response_type=code&client_id=Ov23li1NLAu45heMNgl4&redirect_uri=http%3A%2F%2Flocalhost%3A9090%2Frealms%2FTurnsManagementApp%2Fbroker%2Fgithub%2Fendpoint','_blank');
+const goGit = () => {
+
+    window.open('https://github.com/login/oauth/authorize?scope=user%3Aemail&state=6Ag12yivuaEzr_KhlSjjQJnYIToNsm4KPPnFgnBVsm8.cZVmOLtM5g8.-Nj_n7lMQBaAXv3akTIAeQ&response_type=code&client_id=Ov23li1NLAu45heMNgl4&redirect_uri=http%3A%2F%2Flocalhost%3A9090%2Frealms%2FTurnsManagementApp%2Fbroker%2Fgithub%2Fendpoint', '_blank');
 }
 const submitForm = async () => {
     try {
@@ -60,6 +60,7 @@ const submitForm = async () => {
 
         const response = await fetch('http://localhost:8080/auth/login', {
             method: 'POST',
+            
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -71,11 +72,20 @@ const submitForm = async () => {
         }
 
         const data = await response.json();
+        const name = data.name;
+        const id = data.id;
 
-        const yourToken = data.access_token;
-        localStorage.setItem('token', yourToken);
-        router.push('admin_main');
+        Cookies.set('token', JSON.parse(data.response.body).access_token, { expires: 1 });
+        Cookies.set('name', name, { expires: 1 });
+        Cookies.set('id', id, { expires: 1 });
+        if (data.role1 == 'admin') {
+            router.push('admin_main');
+        } else {
+            router.push('user_main')
+        }
 
+
+        console.log(data);
         console.log("Logueado correctamente");
     } catch (error) {
         console.error('Error en la solicitud al servidor:', error.message);

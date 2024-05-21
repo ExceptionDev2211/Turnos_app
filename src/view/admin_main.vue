@@ -84,38 +84,7 @@
                                     <td>10</td>
                                     <td>120</td>
                                 </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
-                                <tr>
-                                    <td>A</td>
-                                    <td>Juan Reyes</td>
-                                    <td>150</td>
-                                    <td>30</td>
-                                    <td>10</td>
-                                    <td>120</td>
-                                </tr>
+                              
 
 
                             </tbody>
@@ -146,6 +115,7 @@ import Popup from '../components/popup.vue';
 import Popup2 from '../components/popup.vue';
 import Popup3 from '../components/popup.vue';
 import Popup4 from '../components/popup.vue';
+import Cookies from 'js-cookie';
 
 const showPopup = ref(false);
 const showPopup2 = ref(false);

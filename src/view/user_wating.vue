@@ -28,7 +28,7 @@
                             <p>Turno actual: </p>
                             <p>Tu turno: </p>
                             <p>Seras atendido por: </p>
-                            <button>Cancelar turno</button>
+                            <button @click="fetchDeleteShift(userId)">Cancelar turno</button>
                         </div>
                     </div>
                 </div>
@@ -43,7 +43,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import Popup from '../components/Popup.vue';
+import Popup from '../components/popup.vue';
+import Cookies from 'js-cookie';
+
+const userId = ref(Cookies.get('id'))
+
 const openPopup = () => {
     showPopup.value = true;
 };
@@ -56,6 +60,38 @@ const showPopup = ref(false);
 const goLogin = () => {
     router.push('/');
 }
+const fetchDeleteShift = async (userId) => {
+    try {
+        const token = Cookies.get('token');
+
+        const config = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const response = await fetch(`http://localhost:8080/shift/${userId}`, config);
+        if (response.ok) {
+            const data = await response.json();
+            alert('Turno cancelado correctamente' )
+            router.push('/user_main');
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+            if (response.status === 401) {
+                alert("No está autorizado. Por favor, inicie sesión.");
+                router.push('/');
+            }
+        }
+    } catch (error) {
+        console.error('Error al eliminar el turno:', error);
+    }
+};
+
+// Llamada a la función para eliminar un turno específico
+fetchDeleteShift('userID123');
+
 
 </script>
 
