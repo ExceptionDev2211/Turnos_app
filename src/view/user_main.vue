@@ -12,8 +12,12 @@
         <div class="main">
             <div class="header">
                 <p class="welcome">Bienvenido: {{ user_name }} </p>
+                 
                 <div class="noti">
 
+                </div>
+                <div class="exit">
+                    <button @click="deleteAllCookies"> <img src="../assets/images/salir.png" alt=""></button>
                 </div>
                 <img class="logo_img" src="../assets/images/logo.png" alt="">
             </div>
@@ -168,7 +172,13 @@ const fetchAddTurn = async () => {
     }
 };
 
-
+const deleteAllCookies = () => {
+    const allCookies = Cookies.get();
+    for (let cookie in allCookies) {
+        Cookies.remove(cookie);
+    }
+    router.push('/');
+};
 
 
 
@@ -195,6 +205,31 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.exit{
+    margin-left: 10px;
+    display: flex;
+    height: 80px;
+    width: 80px;
+    
+}
+.exit button{
+    display: flex;
+    width: 70px;
+    align-items: center;
+    justify-content: center;
+    background:none;
+    border: none;
+    cursor: pointer;
+}
+.exit button:hover{
+    transform: scale(1.05);
+}
+
+.exit button img{
+    height: 100%;
+    filter: invert();
+
+}
 .cont {
     display: flex;
     justify-content: center;

@@ -18,11 +18,14 @@
         </Popup2>
         <div class="main">
             <div class="header">
-                <p class="welcome">Bienvenido: </p>
+                <p class="welcome">Bienvenido: {{ user_name }}</p>
                 <div class="noti">
                     <button class="btn_noti" v-show="showNotificationButton" @click="openPopup">
                     <img class="logo_img" src="../assets/images/noti.png" alt="">
                 </button>
+                </div>
+                <div class="exit">
+                    <button @click="deleteAllCookies"> <img src="../assets/images/salir.png" alt=""></button>
                 </div>
                 <img class="logo_img" src="../assets/images/logo.png" alt="">
             </div>
@@ -57,7 +60,7 @@ import Popup2 from '../components/popup.vue';
 import Cookies from 'js-cookie';
 
 const userId = ref(Cookies.get('id'))
-
+const user_name = ref(Cookies.get('name'));
 const openPopup = () => {
     showPopup.value = true;
 };
@@ -134,6 +137,13 @@ const fetchUser = async () => {
         console.error('Error al obtener estaciones:', error);
 
     }
+};
+const deleteAllCookies = () => {
+    const allCookies = Cookies.get();
+    for (let cookie in allCookies) {
+        Cookies.remove(cookie);
+    }
+    router.push('/');
 };
 const showNotificationButton = ref(false);
 const dependency = ref('')
@@ -248,6 +258,7 @@ onMounted(() => {
     width: 10%;
     height: 50%;
     margin-left: auto;
+    
 }
 
 .logo_img {
@@ -280,6 +291,31 @@ onMounted(() => {
 .waitingImg img {
     height: 105%;
 
+
+}
+.exit{
+    margin-left: 10px;
+    display: flex;
+    height: 80px;
+    width: 80px;
+    
+}
+.exit button{
+    display: flex;
+    width: 70px;
+    align-items: center;
+    justify-content: center;
+    background:none;
+    border: none;
+    cursor: pointer;
+}
+.exit button:hover{
+    transform: scale(1.05);
+}
+
+.exit button img{
+    height: 100%;
+    filter: invert();
 
 }
 
@@ -332,6 +368,11 @@ onMounted(() => {
     transform: all 0.3s ease;
     
 }
+.btn_noti img{
+    filter: invert();
+}    
+
+
 .btn_noti:hover{
     transform: scale(1.1);
 }

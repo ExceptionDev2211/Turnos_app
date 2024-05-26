@@ -22,7 +22,7 @@ const router = createRouter({
         name: 'Admin_main',
         path: '/admin_main',
         component: () => import('../view/admin_main.vue'),
-         meta: { requiresAuth: true }
+        meta: { requiresAuth: true }
       },
       {
         name: 'User_main',
